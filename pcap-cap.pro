@@ -10,9 +10,11 @@ CONFIG += c++17
 
 SOURCES += \
     main.cpp \
+    pcapmanager.cpp \
     widget.cpp
 
 HEADERS += \
+    pcapmanager.h \
     widget.h
 
 FORMS += \
@@ -22,3 +24,19 @@ FORMS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+
+# macOS
+macx {
+    INCLUDEPATH += $$PWD/../libpcap/out/macos/include
+    LIBS += -L$$PWD/../libpcap/out/macos/lib -lpcap
+}
+
+# Android
+android {
+    INCLUDEPATH += $$PWD/../libpcap/out/android/include
+    LIBS += -L$$PWD/../libpcap/out/android/lib -lpcap
+}
+
+# static link
+LIBS += -lpcap
