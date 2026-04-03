@@ -12,7 +12,6 @@ Widget::Widget(QWidget *parent)
 {
     ui->setupUi(this);
     startRootDaemon();
-    loadNICs();
 }
 
 Widget::~Widget()
@@ -27,17 +26,6 @@ Widget::~Widget()
     delete ui;
 }
 
-void Widget::loadNICs()
-{
-    QList<NICInfo> nics = PcapManager::getNICList();
-
-    ui->nicComboBox->clear();
-
-    for (const NICInfo &nic : nics)
-    {
-        ui->nicComboBox->addItem(nic.name);
-    }
-}
 
 void Widget::startRootDaemon()
 {

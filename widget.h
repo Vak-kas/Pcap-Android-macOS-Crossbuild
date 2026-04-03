@@ -27,7 +27,6 @@ private:
     Ui::Widget *ui;
 
     QProcess *daemonProcess;
-    void loadNICs();
 
 };
 #endif // WIDGET_H
