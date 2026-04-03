@@ -19,5 +19,6 @@ public:
 
 private:
     Ui::Widget *ui;
+    void loadNICs();
 };
 #endif // WIDGET_H
