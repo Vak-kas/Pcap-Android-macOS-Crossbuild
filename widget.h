@@ -2,6 +2,7 @@
 #define WIDGET_H
 
 #include <QWidget>
+#include <QProcess>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -17,8 +18,16 @@ public:
     Widget(QWidget *parent = nullptr);
     ~Widget();
 
+private slots:
+    void startRootDaemon();
+    // void onDaemonOutput();
+    // void onDaemonError();
+
 private:
     Ui::Widget *ui;
+
+    QProcess *daemonProcess;
     void loadNICs();
+
 };
 #endif // WIDGET_H
