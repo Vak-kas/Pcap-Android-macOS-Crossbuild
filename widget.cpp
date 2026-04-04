@@ -14,8 +14,14 @@ Widget::Widget(QWidget *parent)
     daemonManager = new DaemonManager(this);
 
 
+    //---------------------Daemon---------------------
     connect(daemonManager, &DaemonManager::nicDiscovered, this, &Widget::onNicDiscovered);
+    #ifdef Q_OS_ANDROID
+        daemonManager->startDaemon();
+    #endif
 
+
+    //---------------------NIC---------------------
     connect(ui->nicComboBox, &NicComboBox::popupOpened,
             this, [this]()
             {
@@ -30,9 +36,18 @@ Widget::Widget(QWidget *parent)
             #endif
             });
 
-#ifdef Q_OS_ANDROID
-    daemonManager->startDaemon();
-#endif
+    //---------------------Table---------------------
+    model = new QStandardItemModel(this);
+    model->setColumnCount(5);
+    model->setHorizontalHeaderLabels({
+        "Time", "Source", "Destination", "Protocol", "Length"
+    });
+    ui->tableView->setModel(model);
+    ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+
+
+
 
 }
 

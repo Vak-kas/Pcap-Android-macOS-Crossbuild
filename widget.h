@@ -5,6 +5,9 @@
 #include <QProcess>
 #include "daemonmanager.h"
 #include <QComboBox>
+#include <QStandardItemModel>
+
+
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class Widget;
@@ -25,6 +28,7 @@ private slots:
 private:
     Ui::Widget *ui;
     DaemonManager *daemonManager;
+    QStandardItemModel *model;
 
 };
 
