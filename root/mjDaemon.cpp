@@ -9,15 +9,12 @@ char cmd[256];
 
 int main()
 {
-    while (1)
+    while (fgets(cmd, sizeof(cmd), stdin)) 
     {
-        if(fgets(cmd, sizeof(cmd), stdin) != NULL)
-        {
-            if(strcmp(cmd, "GET_NIC") == 0)
-            {
-                handleGetNIC();
-            }
+        if (strncmp(cmd, "GET_NIC", 7) == 0) {
+            handleGetNIC();
         }
+        usleep(100000);
     }
     return 0;
 }
