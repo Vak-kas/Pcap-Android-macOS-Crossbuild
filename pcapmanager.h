@@ -1,16 +1,7 @@
-#ifndef PCAPMANAGER_H
-#define PCAPMANAGER_H
+#include <string>
+#include <vector>
+#include <pcap.h>
 
-#include <QString>
-#include <QList>
-
-
-class PcapManager
-{
-public:
-
-};
+std::vector<std::string> getNICList();
 
 
-
-#endif // PCAPMANAGER_H
