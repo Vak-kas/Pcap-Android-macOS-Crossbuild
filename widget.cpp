@@ -3,74 +3,27 @@
 #include "pcapmanager.h"
 #include "QProcess"
 #include <QStandardPaths>
+#include "daemonmanager.h"
 
 
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::Widget)
-    , daemonProcess(nullptr)
 {
     ui->setupUi(this);
-    startRootDaemon();
+    daemonManager = new DaemonManager(this);
+
+    connect(daemonManager, &DaemonManager::nicDiscovered,
+            this, [this](QString nic)
+            {
+                if (ui->nicComboBox->findText(nic) == -1)
+                    ui->nicComboBox->addItem(nic);
+            });
+
+    daemonManager->startDaemon();
 }
 
 Widget::~Widget()
 {
-    if (daemonProcess && daemonProcess->state() == QProcess::Running)
-    {
-        daemonProcess->kill();              // 프로세스 강제 종료
-        daemonProcess->waitForFinished();   // 완전히 종료될 때까지 대기
-    }
-
-    delete daemonProcess;   // 메모리 해제
     delete ui;
-}
-
-
-void Widget::startRootDaemon()
-{
-    if (daemonProcess && daemonProcess->state() == QProcess::Running)
-    {
-        return;
-    }
-
-    if (daemonProcess)
-    {
-        delete daemonProcess;
-        daemonProcess = nullptr;
-    }
-
-    daemonProcess = new QProcess(this);
-    QString daemonName = "mjDaemon";
-
-    connect(daemonProcess, &QProcess::readyReadStandardOutput,
-            this, &Widget::onDaemonOutput);
-
-    connect(daemonProcess, &QProcess::readyReadStandardError,
-            this, &Widget::onDaemonError);
-
-    QString daemonPath = "/data/local/tmp/" + daemonName;
-
-    QStringList args;
-    args << "-c" << daemonPath;
-
-    daemonProcess->start("su", args);
-}
-
-void Widget::onDaemonOutput()
-{
-    if (!daemonProcess) return;
-
-    QByteArray data = daemonProcess->readAllStandardOutput();
-
-    qDebug() << "[DAEMON OUTPUT]" << data;
-}
-
-void Widget::onDaemonError()
-{
-    if (!daemonProcess) return;
-
-    QByteArray data = daemonProcess->readAllStandardError();
-
-    qDebug() << "[DAEMON ERROR]" << data;
 }
