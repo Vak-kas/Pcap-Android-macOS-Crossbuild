@@ -1,5 +1,6 @@
 #include "daemonmanager.h"
 #include <QDebug>
+#include "common.h"
 
 DaemonManager::DaemonManager(QObject *parent)
     : QObject(parent), process(nullptr)
@@ -8,6 +9,7 @@ DaemonManager::DaemonManager(QObject *parent)
 
 void DaemonManager::startDaemon()
 {
+#ifdef Q_OS_ANDROID
     if (process)
     {
         if (process->state() == QProcess::Running)
@@ -25,18 +27,17 @@ void DaemonManager::startDaemon()
     connect(process, &QProcess::readyReadStandardError,
             this, &DaemonManager::onDaemonError);
 
-    QString daemonName = "mjDaemon";
-    QString daemonPath = "/data/local/tmp/" + daemonName;
-
-    QStringList args;
-    args << "-c" << daemonPath;
-
-    process->start("su", args);
-    if (!process->waitForStarted())
-    {
-        qDebug() << "Daemon start failed";
+    process->start("su");
+    if (!process->waitForStarted()) {
+        qDebug() << "su execution failed";
         return;
     }
+
+    process->write("/data/local/tmp/mjDaemon\n"); 
+    process->waitForBytesWritten(); // 명령어가 확실히 전달되도록 대기
+#else
+    qDebug() << "Native OS (macOS/Windows): Daemon start skipped.";
+#endif
 }
 
 void DaemonManager::requestNICList()
@@ -47,23 +48,34 @@ void DaemonManager::requestNICList()
     }
 }
 
+
 void DaemonManager::onDaemonOutput()
 {
-    QByteArray data = process->readAllStandardOutput();
-    QString text = QString::fromUtf8(data);
+    buffer.append(process->readAllStandardOutput());
 
-    QStringList lines = text.split("\n");
-
-    for (QString line : lines)
+    // qint64와 size_t 비교 시 안전하게 int로 캐스팅
+    while (buffer.size() >= (int)sizeof(MsgHeader))
     {
-        if (line.startsWith("NIC:"))
+        MsgHeader header;
+        memcpy(&header, buffer.data(), sizeof(MsgHeader));
+
+        // 데이터가 쪼개져서 왔을 때를 대비한 핵심 로직
+        if (buffer.size() < (int)(sizeof(MsgHeader) + header.length))
         {
-            QString nic = line.mid(4);
+            break;
+        }
+
+        QByteArray payload = buffer.mid(sizeof(MsgHeader), header.length);
+        buffer.remove(0, sizeof(MsgHeader) + header.length);
+
+        if (header.type == MSG_NIC)
+        {
+            QString nic = QString::fromUtf8(payload);
+            qDebug() << "[SUCCESS] Emitting NIC:" << nic;
             emit nicDiscovered(nic);
         }
     }
 }
-
 
 void DaemonManager::onDaemonError()
 {
@@ -72,3 +84,13 @@ void DaemonManager::onDaemonError()
 
     qDebug() << "[DAEMON ERROR]" << text;
 }
+
+DaemonManager::~DaemonManager()
+{
+    if (process && process->state() == QProcess::Running)
+    {
+        process->kill();
+        process->waitForFinished();
+    }
+}
+

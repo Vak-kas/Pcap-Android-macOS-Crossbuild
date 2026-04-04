@@ -24,6 +24,7 @@ private slots:
 
 private:
     QProcess *process;
+    QByteArray buffer;
 };
 
 #endif // DAEMONMANAGER_H
