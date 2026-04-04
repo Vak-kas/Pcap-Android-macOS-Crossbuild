@@ -43,11 +43,11 @@ void Widget::startRootDaemon()
     daemonProcess = new QProcess(this);
     QString daemonName = "mjDaemon";
 
-    // connect(daemonProcess, &QProcess::readyReadStandardOutput,
-    //         this, &Widget::onDaemonOutput);
+    connect(daemonProcess, &QProcess::readyReadStandardOutput,
+            this, &Widget::onDaemonOutput);
 
-    // connect(daemonProcess, &QProcess::readyReadStandardError,
-    //         this, &Widget::onDaemonError);
+    connect(daemonProcess, &QProcess::readyReadStandardError,
+            this, &Widget::onDaemonError);
 
     QString daemonPath = "/data/local/tmp/" + daemonName;
 
@@ -55,4 +55,22 @@ void Widget::startRootDaemon()
     args << "-c" << daemonPath;
 
     daemonProcess->start("su", args);
+}
+
+void Widget::onDaemonOutput()
+{
+    if (!daemonProcess) return;
+
+    QByteArray data = daemonProcess->readAllStandardOutput();
+
+    qDebug() << "[DAEMON OUTPUT]" << data;
+}
+
+void Widget::onDaemonError()
+{
+    if (!daemonProcess) return;
+
+    QByteArray data = daemonProcess->readAllStandardError();
+
+    qDebug() << "[DAEMON ERROR]" << data;
 }

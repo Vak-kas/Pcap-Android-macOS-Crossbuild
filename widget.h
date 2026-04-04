@@ -20,8 +20,8 @@ public:
 
 private slots:
     void startRootDaemon();
-    // void onDaemonOutput();
-    // void onDaemonError();
+    void onDaemonOutput();
+    void onDaemonError();
 
 private:
     Ui::Widget *ui;
