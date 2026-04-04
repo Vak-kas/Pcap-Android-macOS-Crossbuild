@@ -1,27 +1,18 @@
 #include "handler.h"
 #include <pcap.h>
 #include <stdio.h>
-#include "common.h"
+#include "../common.h"
 #include <string.h>
+#include "../pcapmanager.h"
 
 void handleGetNIC()
 {
-    pcap_if_t *alldevs;
-    char errbuf[PCAP_ERRBUF_SIZE];
-
-    if (pcap_findalldevs(&alldevs, errbuf) == -1)
+    std::vector<std::string> nicList = getNICList();
+    for (const auto& nic : nicList)
     {
-        //TODO : Protocol 핸들링
-        return;
+        sendNIC(nic.c_str());
     }
-
-    for (pcap_if_t *d = alldevs; d != NULL; d = d->next)
-    {
-        if (d->name)
-            sendNIC(d->name);
-    }
-
-    pcap_freealldevs(alldevs);
+        fflush(stdout);
 }
 
 void sendNIC(const char* name)
