@@ -1,0 +1,1 @@
+~/Library/Android/sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/darwin-x86_64/bin/aarch64-linux-android21-clang++ ./root/mjDaemon.cpp -o mjDaemon -static-libstdc++
