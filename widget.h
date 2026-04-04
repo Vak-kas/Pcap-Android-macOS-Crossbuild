@@ -3,7 +3,8 @@
 
 #include <QWidget>
 #include <QProcess>
-
+#include "daemonmanager.h"
+#include <QComboBox>
 QT_BEGIN_NAMESPACE
 namespace Ui {
 class Widget;
@@ -19,14 +20,35 @@ public:
     ~Widget();
 
 private slots:
-    void startRootDaemon();
-    void onDaemonOutput();
-    void onDaemonError();
+    void onNicDiscovered(const QString &nic);
 
 private:
     Ui::Widget *ui;
-
-    QProcess *daemonProcess;
+    DaemonManager *daemonManager;
 
 };
+
+
+class NicComboBox : public QComboBox
+{
+    Q_OBJECT
+
+public:
+    using QComboBox::QComboBox;
+
+signals:
+    void popupOpened();
+
+protected:
+    void showPopup() override
+    {
+        emit popupOpened();
+        QComboBox::showPopup();
+    }
+};
+
+
+
+
 #endif // WIDGET_H
+
