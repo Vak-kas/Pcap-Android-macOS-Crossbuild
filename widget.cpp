@@ -19,8 +19,6 @@ Widget::Widget(QWidget *parent)
     connect(ui->nicComboBox, &NicComboBox::popupOpened,
             this, [this]()
             {
-                ui->nicComboBox->clear();
-
             #ifdef Q_OS_ANDROID
                 daemonManager->requestNICList();
             #else
@@ -46,5 +44,10 @@ Widget::~Widget()
 
 void Widget::onNicDiscovered(const QString &nic)
 {
-    ui->nicComboBox->addItem(nic);
+    // 중복 추가 방지 및 로그 확인
+    if (ui->nicComboBox->findText(nic) == -1)
+    {
+        ui->nicComboBox->addItem(nic);
+        qDebug() << "UI added:" << nic << "Total count:" << ui->nicComboBox->count();
+    }
 }
