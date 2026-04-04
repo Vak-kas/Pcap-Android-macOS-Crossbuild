@@ -26,7 +26,7 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
-       <widget class="QComboBox" name="nicComboBox"/>
+       <widget class="NicComboBox" name="nicComboBox"/>
       </item>
       <item>
        <widget class="QPushButton" name="pushButton">
@@ -82,6 +82,13 @@
    </layout>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>NicComboBox</class>
+   <extends>QComboBox</extends>
+   <header>widget.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
