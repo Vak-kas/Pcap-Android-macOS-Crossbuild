@@ -1,11 +1,18 @@
+#pragma once
 #ifndef WIDGET_H
 #define WIDGET_H
 
 #include <QWidget>
 #include <QProcess>
-#include "daemonmanager.h"
 #include <QComboBox>
 #include <QStandardItemModel>
+#include "pcapmanager.h"
+#include <QStandardPaths>
+#include <pcap.h>
+#include "daemonmanager.h"
+#include "dto.h"
+
+
 
 
 QT_BEGIN_NAMESPACE
@@ -24,6 +31,7 @@ public:
 
 private slots:
     void onNicDiscovered(const QString &nic);
+    void addPacketRow(const PacketDTO &pkt);
 
 private:
     Ui::Widget *ui;

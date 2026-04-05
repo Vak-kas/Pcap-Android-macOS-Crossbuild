@@ -1,9 +1,5 @@
 #include "widget.h"
 #include "ui_widget.h"
-#include "pcapmanager.h"
-#include "QProcess"
-#include <QStandardPaths>
-#include <pcap.h>
 
 
 Widget::Widget(QWidget *parent)
@@ -44,12 +40,25 @@ Widget::Widget(QWidget *parent)
     });
     ui->tableView->setModel(model);
     ui->tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->tableView->verticalHeader()->setVisible(true);
+    ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
+    connect(ui->pushButton_3, &QPushButton::clicked, this, [this]()
+            {
 
+                PacketDTO pkt;
+                pkt.time = "12:00:00";
+                pkt.src = "192.168.0.1";
+                pkt.dst = "192.168.0.2";
+                pkt.proto = "TCP";
+                pkt.length = 60;
 
-
-
+                addPacketRow(pkt);
+            });
 }
+
+
 
 Widget::~Widget()
 {
@@ -65,4 +74,19 @@ void Widget::onNicDiscovered(const QString &nic)
         ui->nicComboBox->addItem(nic);
         qDebug() << "UI added:" << nic << "Total count:" << ui->nicComboBox->count();
     }
+}
+
+
+void Widget::addPacketRow(const PacketDTO &pkt)
+{
+    QList<QStandardItem*> row;
+
+    row << new QStandardItem(pkt.time);
+    row << new QStandardItem(pkt.src);
+    row << new QStandardItem(pkt.dst);
+    row << new QStandardItem(pkt.proto);
+    row << new QStandardItem(QString::number(pkt.length));
+
+    model->appendRow(row);
+    ui->tableView->scrollToBottom();
 }
