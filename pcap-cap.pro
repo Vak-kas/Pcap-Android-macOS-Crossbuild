@@ -11,6 +11,7 @@ CONFIG += c++17
 SOURCES += \
     common.cpp \
     daemonmanager.cpp \
+    dto.cpp \
     main.cpp \
     pcapmanager.cpp \
     widget.cpp
@@ -18,6 +19,7 @@ SOURCES += \
 HEADERS += \
     common.h \
     daemonmanager.h \
+    dto.h \
     pcapmanager.h \
     widget.h
 
