@@ -21,6 +21,20 @@ Widget::Widget(QWidget *parent)
     connect(ui->nicComboBox, &NicComboBox::popupOpened, this, &Widget::onNicPopupOpened);
     connect(ui->nicComboBox, &QComboBox::currentTextChanged, this, &Widget::onNicSelected);
 
+
+    // -----------Capture Control Button-----------
+    connect(ui->startButton, &QPushButton::clicked,
+            this, &Widget::onStartClicked);
+
+    connect(daemonManager, &DaemonManager::packetReceived,
+            this, &Widget::onPacketReceived);
+
+    connect(ui->stopButton, &QPushButton::clicked,
+            this, &Widget::onStopClicked);
+
+    connect(ui->resetButton, &QPushButton::clicked,
+            this, &Widget::onResetClicked);
+
     //---------------------Table---------------------
     model = new QStandardItemModel(this);
     model->setColumnCount(5);
@@ -33,18 +47,7 @@ Widget::Widget(QWidget *parent)
     ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-    connect(ui->pushButton_3, &QPushButton::clicked, this, [this]()
-            {
 
-                PacketDTO pkt;
-                pkt.time = "12:00:00";
-                pkt.src = "192.168.0.1";
-                pkt.dst = "192.168.0.2";
-                pkt.proto = "TCP";
-                pkt.length = 60;
-
-                addPacketRow(pkt);
-            });
 
 
 }
@@ -107,4 +110,62 @@ void Widget::onNicSelected(const QString& nic)
 {
     selectedNic = nic;
     qDebug() << "Selected NIC: " << nic;
+}
+
+void Widget::onStartClicked()
+{
+    if (selectedNic.isEmpty())
+    {
+        qDebug() << "No NIC selected";
+        return;
+    }
+
+    if (isCapturing)
+    {
+        qDebug() << "Already capturing";
+        return;
+    }
+
+#ifdef Q_OS_ANDROID
+    daemonManager->startCapture(selectedNic);
+    isCapturing = true;
+#else
+    //macos 캡처
+#endif
+
+}
+
+void Widget::onStopClicked()
+{
+#ifdef Q_OS_ANDROID
+    daemonManager->stopCapture();
+#else
+    //masos
+#endif
+
+    isCapturing = false;
+}
+
+void Widget::onResetClicked()
+{
+    model->removeRows(0, model->rowCount());
+    model->setHorizontalHeaderLabels({
+        "Time", "Source", "Destination", "Protocol", "Length"
+    });
+}
+
+
+
+void Widget::onPacketReceived(const QByteArray& data)
+{
+    qDebug() << "Packet received:" << data.size();
+
+    PacketDTO pkt;
+    pkt.time = QTime::currentTime().toString("HH:mm:ss");
+    pkt.src = "-";
+    pkt.dst = "-";
+    pkt.proto = "RAW";
+    pkt.length = data.size();
+
+    addPacketRow(pkt);
 }

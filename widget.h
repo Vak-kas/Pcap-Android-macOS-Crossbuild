@@ -11,6 +11,8 @@
 #include <pcap.h>
 #include "daemonmanager.h"
 #include "dto.h"
+#include <thread>
+#include <QTime>
 
 
 
@@ -36,12 +38,18 @@ private slots:
     void loadNICList();
     void onNicSelected(const QString& nic);
 
+    void onStartClicked();
+    void onStopClicked();
+    void onResetClicked();
+
+    void onPacketReceived(const QByteArray& data);
+
 private:
     Ui::Widget *ui;
     DaemonManager *daemonManager;
     QStandardItemModel *model;
     QString selectedNic;
-
+    bool isCapturing = false;
 };
 
 
