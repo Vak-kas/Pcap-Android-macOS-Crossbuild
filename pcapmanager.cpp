@@ -23,3 +23,23 @@ std::vector<std::string> getNICList()
     pcap_freealldevs(alldevs);
     return result;
 }
+
+pcap_t* initPcap(const std::string& device)
+{
+    char errbuf[PCAP_ERRBUF_SIZE];
+    pcap_t* pcap = pcap_open_live(device.c_str(), BUFSIZ, 1, 1000, errbuf);
+
+    if (pcap == NULL) {
+        printf("pcap_open_live error: %s\n", errbuf);
+        return nullptr;
+    }
+
+    return pcap;
+}
+
+void closePcap(pcap_t* pcap)
+{
+    if (pcap)
+        pcap_close(pcap);
+}
+
