@@ -27,14 +27,12 @@ void DaemonManager::startDaemon()
     connect(process, &QProcess::readyReadStandardError,
             this, &DaemonManager::onDaemonError);
 
-    process->start("su");
+    process->start("su", QStringList() << "-c" << "/data/local/tmp/mjDaemon");
+
     if (!process->waitForStarted()) {
         qDebug() << "su execution failed";
         return;
     }
-
-    process->write("/data/local/tmp/mjDaemon\n"); 
-    process->waitForBytesWritten(); // 명령어가 확실히 전달되도록 대기
 #else
     qDebug() << "Native OS (macOS/Windows): Daemon start skipped.";
 #endif
@@ -45,6 +43,23 @@ void DaemonManager::requestNICList()
     if (process && process->state() == QProcess::Running)
     {
         process->write("GET_NIC\n");
+    }
+}
+
+void DaemonManager::startCapture(const QString& nic)
+{
+    if (process && process->state() == QProcess::Running)
+    {
+        QString cmd = "START_CAPTURE " + nic + "\n";
+        process->write(cmd.toUtf8());
+    }
+}
+
+void DaemonManager::stopCapture()
+{
+    if (process && process->state() == QProcess::Running)
+    {
+        process->write("STOP_CAPTURE\n");
     }
 }
 
@@ -74,6 +89,11 @@ void DaemonManager::onDaemonOutput()
             qDebug() << "[SUCCESS] Emitting NIC:" << nic;
             emit nicDiscovered(nic);
         }
+        else if (header.type == MSG_PKT)
+        {
+            qDebug() << "[PKT] size:" << header.length;
+            emit packetReceived(payload);
+        }
     }
 }
 
@@ -87,10 +107,13 @@ void DaemonManager::onDaemonError()
 
 DaemonManager::~DaemonManager()
 {
+#ifdef Q_OS_ANDROID
     if (process && process->state() == QProcess::Running)
     {
-        process->kill();
-        process->waitForFinished();
+        process->write("EXIT\n");
+        process->waitForBytesWritten();
+        process->waitForFinished(1000);
+        process->kill(); // fallback
     }
+#endif
 }
-
