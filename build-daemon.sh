@@ -7,6 +7,7 @@ $NDK_BIN/aarch64-linux-android28-clang++ \
     ./root/mjDaemon.cpp \
     ./root/handler.cpp \
     ./pcapmanager.cpp \
+    ./common.cpp \
     -I../libpcap/out/android/include \
     -L../libpcap/out/android/lib \
     -lpcap \
