@@ -12,6 +12,10 @@ SOURCES += \
     common.cpp \
     daemonmanager.cpp \
     dto.cpp \
+    ethernet.cpp \
+    ip.cpp \
+    ipheader.cpp \
+    mac.cpp \
     main.cpp \
     pcapmanager.cpp \
     widget.cpp
@@ -20,7 +24,12 @@ HEADERS += \
     common.h \
     daemonmanager.h \
     dto.h \
+    ethernet.h \
+    ip.h \
+    ipheader.h \
+    mac.h \
     pcapmanager.h \
+    pch.h \
     widget.h
 
 FORMS += \
