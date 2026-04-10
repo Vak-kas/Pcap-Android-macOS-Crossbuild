@@ -34,11 +34,13 @@ private slots:
     void addPacketRow(const PacketDTO &pkt);
     void onNicPopupOpened();
     void loadNICList();
+    void onNicSelected(const QString& nic);
 
 private:
     Ui::Widget *ui;
     DaemonManager *daemonManager;
     QStandardItemModel *model;
+    QString selectedNic;
 
 };
 

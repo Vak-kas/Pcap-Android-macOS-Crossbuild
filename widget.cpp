@@ -19,6 +19,7 @@ Widget::Widget(QWidget *parent)
 
     //---------------------NIC---------------------
     connect(ui->nicComboBox, &NicComboBox::popupOpened, this, &Widget::onNicPopupOpened);
+    connect(ui->nicComboBox, &QComboBox::currentTextChanged, this, &Widget::onNicSelected);
 
     //---------------------Table---------------------
     model = new QStandardItemModel(this);
@@ -44,6 +45,8 @@ Widget::Widget(QWidget *parent)
 
                 addPacketRow(pkt);
             });
+
+
 }
 
 
@@ -98,4 +101,10 @@ void Widget::loadNICList()
     {
         onNicDiscovered(QString::fromStdString(nicName));
     }
+}
+
+void Widget::onNicSelected(const QString& nic)
+{
+    selectedNic = nic;
+    qDebug() << "Selected NIC: " << nic;
 }
