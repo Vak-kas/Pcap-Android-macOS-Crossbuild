@@ -32,6 +32,8 @@ public:
 private slots:
     void onNicDiscovered(const QString &nic);
     void addPacketRow(const PacketDTO &pkt);
+    void onNicPopupOpened();
+    void loadNICList();
 
 private:
     Ui::Widget *ui;

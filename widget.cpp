@@ -18,19 +18,7 @@ Widget::Widget(QWidget *parent)
 
 
     //---------------------NIC---------------------
-    connect(ui->nicComboBox, &NicComboBox::popupOpened,
-            this, [this]()
-            {
-            #ifdef Q_OS_ANDROID
-                daemonManager->requestNICList();
-            #else
-                std::vector<std::string> nics = getNICList();
-                for (const auto& nicName : nics)
-                {
-                    this->onNicDiscovered(QString::fromStdString(nicName));
-                }
-            #endif
-            });
+    connect(ui->nicComboBox, &NicComboBox::popupOpened, this, &Widget::onNicPopupOpened);
 
     //---------------------Table---------------------
     model = new QStandardItemModel(this);
@@ -89,4 +77,25 @@ void Widget::addPacketRow(const PacketDTO &pkt)
 
     model->appendRow(row);
     ui->tableView->scrollToBottom();
+}
+
+void Widget::onNicPopupOpened()
+{
+#ifdef Q_OS_ANDROID
+    daemonManager->requestNICList();
+#else
+    loadNICList();
+#endif
+
+}
+
+void Widget::loadNICList()
+{
+    ui->nicComboBox->clear();
+
+    std::vector<std::string> nics = getNICList();
+    for (const auto& nicName : nics)
+    {
+        onNicDiscovered(QString::fromStdString(nicName));
+    }
 }
