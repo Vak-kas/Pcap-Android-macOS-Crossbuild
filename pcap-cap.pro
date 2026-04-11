@@ -17,6 +17,7 @@ SOURCES += \
     ipheader.cpp \
     mac.cpp \
     main.cpp \
+    packetmanager.cpp \
     pcapmanager.cpp \
     widget.cpp
 
@@ -28,6 +29,7 @@ HEADERS += \
     ip.h \
     ipheader.h \
     mac.h \
+    packetmanager.h \
     pcapmanager.h \
     pch.h \
     widget.h
