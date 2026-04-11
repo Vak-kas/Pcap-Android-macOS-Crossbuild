@@ -13,6 +13,7 @@
 #include "dto.h"
 #include <thread>
 #include <QTime>
+#include "packetmanager.h"
 
 
 

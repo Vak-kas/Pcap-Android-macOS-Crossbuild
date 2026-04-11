@@ -156,16 +156,12 @@ void Widget::onResetClicked()
 
 
 
+
 void Widget::onPacketReceived(const QByteArray& data)
 {
-    qDebug() << "Packet received:" << data.size();
+    PacketDTO pkt = PacketManager::parsePacket(data);
 
-    PacketDTO pkt;
     pkt.time = QTime::currentTime().toString("HH:mm:ss");
-    pkt.src = "-";
-    pkt.dst = "-";
-    pkt.proto = "RAW";
-    pkt.length = data.size();
 
     addPacketRow(pkt);
 }
