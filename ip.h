@@ -20,6 +20,7 @@ public:
     bool operator==(const Ip& other) const { return ip_addr_ == other.ip_addr_; }
     bool operator!=(const Ip& other) const { return ip_addr_ != other.ip_addr_; }
 
+    std::string toString() const;
 
     Ip getDefaultGateway(std::string device) const;
 };

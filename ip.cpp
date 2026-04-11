@@ -42,3 +42,16 @@ Ip Ip::getDefaultGateway(std::string device) const
     pclose(pipe);
     exit(1);
 }
+
+std::string Ip::toString() const {
+    uint32_t ip_ = addr();
+
+    char buffer[32];
+    snprintf(buffer, sizeof(buffer),"%u.%u.%u.%u",
+             (ip_ >> 24) & 0xFF,
+             (ip_ >> 16) & 0xFF,
+             (ip_ >> 8) & 0xFF,
+             ip_ & 0xFF);
+
+    return std::string(buffer);
+}
