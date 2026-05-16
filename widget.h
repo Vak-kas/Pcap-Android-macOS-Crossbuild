@@ -14,6 +14,7 @@
 #include <thread>
 #include <QTime>
 #include "packetmanager.h"
+#include <QMessageBox>
 
 
 
@@ -44,6 +45,10 @@ private slots:
     void onResetClicked();
 
     void onPacketReceived(const QByteArray& data);
+
+    void onMonitorModeToggled(bool checked);
+    void onDaemonErrorReceived(const QString& msg);
+    void onDaemonLogReceived(const QString& msg);
 
 private:
     Ui::Widget *ui;

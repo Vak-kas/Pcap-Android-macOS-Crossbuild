@@ -47,6 +47,12 @@ Widget::Widget(QWidget *parent)
     ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
+    //------------------Monitor Mode------------------
+    connect(ui->monitorModeCheckBox, &QCheckBox::toggled, this, &Widget::onMonitorModeToggled);
+    connect(daemonManager, &DaemonManager::daemonError, this, &Widget::onDaemonErrorReceived);
+
+    connect(daemonManager, &DaemonManager::daemonLog, this, &Widget::onDaemonLogReceived);
+
 
 
 
@@ -110,6 +116,10 @@ void Widget::onNicSelected(const QString& nic)
 {
     selectedNic = nic;
     qDebug() << "Selected NIC: " << nic;
+
+    ui->monitorModeCheckBox->blockSignals(true);
+    ui->monitorModeCheckBox->setChecked(false);
+    ui->monitorModeCheckBox->blockSignals(false);
 }
 
 void Widget::onStartClicked()
@@ -164,4 +174,72 @@ void Widget::onPacketReceived(const QByteArray& data)
     pkt.time = QTime::currentTime().toString("HH:mm:ss");
 
     addPacketRow(pkt);
+}
+
+void Widget::onMonitorModeToggled(bool checked)
+{
+    if (selectedNic.isEmpty())
+    {
+        QMessageBox::warning(this, "NIC not selected",
+                             "Please select a network interface first.");
+
+        ui->monitorModeCheckBox->blockSignals(true);
+        ui->monitorModeCheckBox->setChecked(false);
+        ui->monitorModeCheckBox->blockSignals(false);
+        return;
+    }
+
+    if (isCapturing)
+    {
+        QMessageBox::warning(this, "Capture running",
+                             "Stop packet capture before changing monitor mode.");
+
+        ui->monitorModeCheckBox->blockSignals(true);
+        ui->monitorModeCheckBox->setChecked(!checked);
+        ui->monitorModeCheckBox->blockSignals(false);
+        return;
+    }
+
+    if (checked)
+    {
+        int ret = QMessageBox::warning(
+            this,
+            "Enable Monitor Mode",
+            "Monitor mode may disconnect the current Wi-Fi connection.\n"
+            "Do you want to continue?",
+            QMessageBox::Yes | QMessageBox::No
+            );
+
+        if (ret != QMessageBox::Yes)
+        {
+            ui->monitorModeCheckBox->blockSignals(true);
+            ui->monitorModeCheckBox->setChecked(false);
+            ui->monitorModeCheckBox->blockSignals(false);
+            return;
+        }
+
+#ifdef Q_OS_ANDROID
+        daemonManager->enableMonitorMode(selectedNic);
+#endif
+    }
+    else
+    {
+#ifdef Q_OS_ANDROID
+        daemonManager->disableMonitorMode(selectedNic);
+#endif
+    }
+}
+
+void Widget::onDaemonErrorReceived(const QString& msg)
+{
+    QMessageBox::warning(this, "Daemon Error", msg);
+
+    ui->monitorModeCheckBox->blockSignals(true);
+    ui->monitorModeCheckBox->setChecked(false);
+    ui->monitorModeCheckBox->blockSignals(false);
+}
+
+void Widget::onDaemonLogReceived(const QString& msg)
+{
+    qDebug() << "[DAEMON LOG]" << msg;
 }
