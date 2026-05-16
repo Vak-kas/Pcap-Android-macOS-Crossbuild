@@ -49,14 +49,14 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_5">
      <item>
-      <widget class="QCheckBox" name="checkBox_2">
+      <widget class="QCheckBox" name="monitorModeCheckBox">
        <property name="text">
         <string>Monitor Mode</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QCheckBox" name="checkBox">
+      <widget class="QCheckBox" name="checkBox_1">
        <property name="text">
         <string>View Only My Packets</string>
        </property>
