@@ -15,3 +15,9 @@ void handleStartCapture(const char* nicName);
 void handleStopCapture();
 void handlePacket(const struct pcap_pkthdr* header, const u_char* packet);
 void packetHandler(u_char* user, const struct pcap_pkthdr* header, const u_char* packet);
+
+void handleMonitorOn(const char* nic);
+void handleMonitorOff(const char* nic);
+bool isMonitorModeSupported();
+void sendLog(const char* msg);
+void sendError(const char* msg);

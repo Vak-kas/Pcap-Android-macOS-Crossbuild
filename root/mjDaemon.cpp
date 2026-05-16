@@ -36,6 +36,21 @@ int main()
                 handleStopCapture();
                 exit(0);
             }
+            else if (strncmp(cmd, "MONITOR_ON", 10) == 0)
+            {
+                fprintf(stderr, "[CMD] MONITOR_ON received: %s\n", cmd);
+                fflush(stderr);
+
+                char* nic = cmd + 11;
+                nic[strcspn(nic, "\n")] = 0;
+                handleMonitorOn(nic);
+            }
+            else if (strncmp(cmd, "MONITOR_OFF", 11) == 0)
+            {
+                char* nic = cmd + 12;
+                nic[strcspn(nic, "\n")] = 0;
+                handleMonitorOff(nic);
+            }
         }
             usleep(10000); // 10ms
     }
