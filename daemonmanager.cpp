@@ -27,6 +27,8 @@ void DaemonManager::startDaemon()
     connect(process, &QProcess::readyReadStandardError,
             this, &DaemonManager::onDaemonError);
 
+
+
     process->start("su", QStringList() << "-c" << "/data/local/tmp/mjDaemon");
 
     if (!process->waitForStarted()) {
@@ -94,6 +96,18 @@ void DaemonManager::onDaemonOutput()
             qDebug() << "[PKT] size:" << header.length;
             emit packetReceived(payload);
         }
+        else if (header.type == MSG_LOG)
+        {
+            QString msg = QString::fromUtf8(payload);
+            qDebug() << "[DAEMON LOG]" << msg;
+            emit daemonLog(msg);
+        }
+        else if (header.type == MSG_ERR)
+        {
+            QString msg = QString::fromUtf8(payload);
+            qDebug() << "[DAEMON ERROR MSG]" << msg;
+            emit daemonError(msg);
+        }
     }
 }
 
@@ -116,4 +130,25 @@ DaemonManager::~DaemonManager()
         process->kill(); // fallback
     }
 #endif
+}
+
+
+void DaemonManager::enableMonitorMode(const QString& nic)
+{
+    if (process && process->state() == QProcess::Running)
+    {
+        QString cmd = "MONITOR_ON " + nic + "\n";
+        qDebug() << "[SEND]" << cmd;
+        process->write(cmd.toUtf8());
+        process->waitForBytesWritten();
+    }
+}
+
+void DaemonManager::disableMonitorMode(const QString& nic)
+{
+    if (process && process->state() == QProcess::Running)
+    {
+        QString cmd = "MONITOR_OFF " + nic + "\n";
+        process->write(cmd.toUtf8());
+    }
 }
