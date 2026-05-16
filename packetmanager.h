@@ -14,7 +14,7 @@
 class PacketManager
 {
 public:
-    PacketDTO parsePacket(const QByteArray& packet);
+    static PacketDTO parsePacket(const QByteArray& packet);
 };
 
 
